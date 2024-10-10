@@ -1,0 +1,159 @@
+To convert the pseudo-code for the **Doubly Circular Priority Queue** into a workable Python program and simulate it, I'll break it down step by step. Below are the steps to help you implement the program and simulate the operations (inserting, removing, and traversing the queue).
+
+### Step 1: Define the Node Class
+We first need to define a class for the Node, which will store the data, priority, and links to the next and previous nodes.
+
+```python
+class Node:
+    def __init__(self, data, priority):
+        self.data = data
+        self.priority = priority
+        self.next = None
+        self.prev = None
+```
+
+### Step 2: Define the Doubly Circular Priority Queue Class
+We then define the class for the queue, where we'll implement the operations such as `insert`, `removeHighestPriority`, `traverseForward`, and `traverseBackward`.
+
+```python
+class DoublyCircularPriorityQueue:
+    def __init__(self):
+        self.head = None
+        self.tail = None
+
+    # Check if the queue is empty
+    def is_empty(self):
+        return self.head is None
+```
+
+### Step 3: Implement the Insertion Method
+The `insert` method adds nodes into the queue based on their priority, maintaining the queue’s order.
+
+```python
+    # Insert a node based on priority
+    def insert(self, data, priority):
+        new_node = Node(data, priority)
+        
+        if self.is_empty():
+            # Queue is empty, the new node becomes head and tail
+            self.head = new_node
+            self.tail = new_node
+            new_node.next = new_node  # Circular link
+            new_node.prev = new_node  # Circular link
+        else:
+            current = self.head
+            while current != self.tail and current.priority <= priority:
+                current = current.next
+
+            # Insert at the front
+            if current == self.head and priority < self.head.priority:
+                new_node.next = self.head
+                new_node.prev = self.tail
+                self.head.prev = new_node
+                self.tail.next = new_node
+                self.head = new_node
+            # Insert at the end
+            elif current == self.tail and priority >= self.tail.priority:
+                new_node.next = self.head
+                new_node.prev = self.tail
+                self.tail.next = new_node
+                self.head.prev = new_node
+                self.tail = new_node
+            # Insert in the middle
+            else:
+                prev_node = current.prev
+                new_node.next = current
+                new_node.prev = prev_node
+                prev_node.next = new_node
+                current.prev = new_node
+```
+
+### Step 4: Implement the Removal of the Highest Priority Element
+The `removeHighestPriority` method removes and returns the node with the highest priority (head of the list).
+
+```python
+    # Remove the node with the highest priority (head)
+    def remove_highest_priority(self):
+        if self.is_empty():
+            return None
+
+        highest_priority_node = self.head
+        
+        # If the queue has only one node
+        if self.head == self.tail:
+            self.head = None
+            self.tail = None
+        else:
+            self.head = self.head.next
+            self.tail.next = self.head
+            self.head.prev = self.tail
+        
+        return highest_priority_node
+```
+
+### Step 5: Implement the Forward Traversal
+This function prints the data and priority of all nodes in the queue from the head to the tail.
+
+```python
+    # Traverse the queue from head to tail
+    def traverse_forward(self):
+        if self.is_empty():
+            print("Queue is empty")
+            return
+        
+        current = self.head
+        while True:
+            print(f"Data: {current.data}, Priority: {current.priority}")
+            current = current.next
+            if current == self.head:
+                break
+```
+
+### Step 6: Implement the Backward Traversal
+This function prints the data and priority of all nodes in the queue from the tail to the head.
+
+```python
+    # Traverse the queue from tail to head
+    def traverse_backward(self):
+        if self.is_empty():
+            print("Queue is empty")
+            return
+        
+        current = self.tail
+        while True:
+            print(f"Data: {current.data}, Priority: {current.priority}")
+            current = current.prev
+            if current == self.tail:
+                break
+```
+
+### Step 7: Simulate the Operations
+
+Here, we will create a `DoublyCircularPriorityQueue` object and simulate operations such as inserting, removing, and traversing the queue.
+
+```python
+if __name__ == "__main__":
+    queue = DoublyCircularPriorityQueue()
+    
+    # Insert elements into the queue
+    queue.insert("Task 1", 1)
+    queue.insert("Task 2", 3)
+    queue.insert("Task 3", 2)
+    queue.insert("Task 4", 0)
+    
+    # Traverse the queue forward
+    print("Queue after insertions (forward traversal):")
+    queue.traverse_forward()
+    
+    # Traverse the queue backward
+    print("\nQueue after insertions (backward traversal):")
+    queue.traverse_backward()
+    
+    # Remove the highest priority element
+    removed_node = queue.remove_highest_priority()
+    print(f"\nRemoved node with highest priority: {removed_node.data}, Priority: {removed_node.priority}")
+    
+    # Traverse the queue forward after removal
+    print("\nQueue after removing the highest priority (forward traversal):")
+    queue.traverse_forward()
+```
